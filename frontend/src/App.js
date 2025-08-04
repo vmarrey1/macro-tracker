@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import './App.css';
-import { Camera, Upload, Target, Activity, Utensils, TrendingUp, Zap, Users } from 'lucide-react';
+import { Camera, Upload, Target, Activity, Utensils, TrendingUp, Zap } from 'lucide-react';
 
 function App() {
   const [selectedImage, setSelectedImage] = useState(null);
