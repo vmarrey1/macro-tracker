@@ -1,0 +1,27 @@
+{
+  "name": "macro-tracker",
+  "version": "1.0.0",
+  "description": "A comprehensive nutrition and fitness tracking application",
+  "main": "index.js",
+  "scripts": {
+    "start": "cd frontend && npm start",
+    "build": "cd frontend && npm run build",
+    "test": "cd frontend && npm test",
+    "install-deps": "cd frontend && npm install",
+    "dev": "cd frontend && npm start"
+  },
+  "keywords": [
+    "nutrition",
+    "fitness",
+    "computer-vision",
+    "react",
+    "spring-boot",
+    "ai"
+  ],
+  "author": "Macro Tracker Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/macro-tracker.git"
+  }
+} 
