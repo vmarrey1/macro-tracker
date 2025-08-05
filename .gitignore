@@ -9,12 +9,42 @@ build/
 dist/
 out/
 
-# Environment variables
+# Environment variables and secrets
 .env
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
+.env.*
+*.env
+
+# API Keys and Secrets
+api-keys.txt
+secrets.txt
+*.key
+*.pem
+*.p12
+*.pfx
+*secret*
+*password*
+*credential*
+
+# SSH Keys
+id_rsa
+id_rsa.pub
+id_ed25519
+id_ed25519.pub
+id_ecdsa
+id_ecdsa.pub
+*.ppk
+ssh/
+.ssh/
+
+# Configuration files with secrets
+config.json
+secrets.json
+credentials.json
+service-account.json
 
 # IDE files
 .vscode/
@@ -102,4 +132,33 @@ application-*.yml
 
 # Temporary files
 tmp/
-temp/ 
+temp/
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Backup files
+*.bak
+*.backup
+*~
+
+# Local development files
+local/
+dev/
+development/
+
+# Certificate files
+*.crt
+*.cert
+*.cer
+
+# Key files
+*.key
+*.keystore
+*.jks
+
+# Log files with potential sensitive data
+*.log
+logs/ 
