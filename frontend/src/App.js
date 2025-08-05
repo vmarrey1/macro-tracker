@@ -38,9 +38,37 @@ function App() {
     }, 2000);
   };
 
-  const generateMealPlan = () => {
-    // Simulate meal plan generation
-    console.log("Generating meal plan...");
+  const generateMealPlan = async () => {
+    try {
+      const calories = document.getElementById('calories').value;
+      const favoriteFoods = document.getElementById('favoriteFoods').value;
+      const numberOfMeals = document.getElementById('numberOfMeals').value;
+      const dietaryRestrictions = document.getElementById('dietaryRestrictions').value;
+      const allergies = document.getElementById('allergies').value;
+
+      const response = await fetch('http://localhost:8080/api/meal-plan/generate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          idealCalories: parseInt(calories),
+          favoriteFoods: favoriteFoods,
+          numberOfMeals: parseInt(numberOfMeals),
+          dietaryRestrictions: dietaryRestrictions,
+          allergies: allergies
+        })
+      });
+      
+      const data = await response.json();
+      console.log("Generated meal plan:", data);
+      
+      // Display the meal plan in a modal or new section
+      alert("Meal plan generated! Check the console for details.");
+    } catch (error) {
+      console.error("Error generating meal plan:", error);
+      alert("Error generating meal plan. Please try again.");
+    }
   };
 
   const generateWorkout = () => {
@@ -187,33 +215,58 @@ function App() {
           <div className="meal-plan-section">
             <div className="section-header">
               <h2>AI-Powered Meal Planning</h2>
-              <p>Get personalized meal plans based on your goals and preferences</p>
+              <p>Create personalized 7-day meal plans based on your preferences</p>
             </div>
-            <div className="plan-cards">
-              <div className="plan-card">
-                <div className="plan-icon">🎯</div>
-                <h3>Weight Loss</h3>
-                <p>Calorie-controlled meals to help you reach your weight goals</p>
-                <button className="plan-button" onClick={generateMealPlan}>
-                  Generate Plan
-                </button>
+            <div className="meal-plan-form">
+              <div className="form-group">
+                <label htmlFor="calories">Daily Calorie Target</label>
+                <input 
+                  type="number" 
+                  id="calories" 
+                  placeholder="e.g., 2000" 
+                  min="1200" 
+                  max="5000"
+                  defaultValue="2000"
+                />
               </div>
-              <div className="plan-card">
-                <div className="plan-icon">💪</div>
-                <h3>Muscle Gain</h3>
-                <p>High-protein meal plans to support muscle growth</p>
-                <button className="plan-button" onClick={generateMealPlan}>
-                  Generate Plan
-                </button>
+              <div className="form-group">
+                <label htmlFor="favoriteFoods">Favorite Foods</label>
+                <input 
+                  type="text" 
+                  id="favoriteFoods" 
+                  placeholder="e.g., chicken, rice, vegetables, eggs, yogurt"
+                  defaultValue="chicken, rice, vegetables, eggs, yogurt"
+                />
               </div>
-              <div className="plan-card">
-                <div className="plan-icon">⚡</div>
-                <h3>Performance</h3>
-                <p>Optimized nutrition for athletic performance</p>
-                <button className="plan-button" onClick={generateMealPlan}>
-                  Generate Plan
-                </button>
+              <div className="form-group">
+                <label htmlFor="numberOfMeals">Number of Meals per Day</label>
+                <select id="numberOfMeals" defaultValue="3">
+                  <option value="2">2 meals</option>
+                  <option value="3">3 meals</option>
+                  <option value="4">4 meals</option>
+                  <option value="5">5 meals</option>
+                  <option value="6">6 meals</option>
+                </select>
               </div>
+              <div className="form-group">
+                <label htmlFor="dietaryRestrictions">Dietary Restrictions (optional)</label>
+                <input 
+                  type="text" 
+                  id="dietaryRestrictions" 
+                  placeholder="e.g., vegetarian, gluten-free"
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="allergies">Allergies (optional)</label>
+                <input 
+                  type="text" 
+                  id="allergies" 
+                  placeholder="e.g., nuts, dairy"
+                />
+              </div>
+              <button className="generate-plan-button" onClick={generateMealPlan}>
+                Generate 7-Day Meal Plan
+              </button>
             </div>
           </div>
         )}
