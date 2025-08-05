@@ -7,6 +7,10 @@ function App() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState(null);
   const [activeTab, setActiveTab] = useState('analyze');
+  const [mealPlan, setMealPlan] = useState(null);
+  const [workoutPlan, setWorkoutPlan] = useState(null);
+  const [isGeneratingMealPlan, setIsGeneratingMealPlan] = useState(false);
+  const [isGeneratingWorkoutPlan, setIsGeneratingWorkoutPlan] = useState(false);
 
   const handleImageUpload = (event) => {
     const file = event.target.files[0];
@@ -40,6 +44,7 @@ function App() {
 
   const generateMealPlan = async () => {
     try {
+      setIsGeneratingMealPlan(true);
       const calories = document.getElementById('calories').value;
       const favoriteFoods = document.getElementById('favoriteFoods').value;
       const numberOfMeals = document.getElementById('numberOfMeals').value;
@@ -61,18 +66,19 @@ function App() {
       });
       
       const data = await response.json();
-      console.log("Generated meal plan:", data);
-      
-      // Display the meal plan in a modal or new section
-      alert("Meal plan generated! Check the console for details.");
+      setMealPlan(data);
+      setActiveTab('meal-plan-results');
     } catch (error) {
       console.error("Error generating meal plan:", error);
       alert("Error generating meal plan. Please try again.");
+    } finally {
+      setIsGeneratingMealPlan(false);
     }
   };
 
   const generateWorkoutPlan = async () => {
     try {
+      setIsGeneratingWorkoutPlan(true);
       const fitnessGoal = document.getElementById('fitnessGoal').value;
       const experienceLevel = document.getElementById('experienceLevel').value;
       const workoutsPerWeek = document.getElementById('workoutsPerWeek').value;
@@ -98,13 +104,13 @@ function App() {
       });
       
       const data = await response.json();
-      console.log("Generated workout plan:", data);
-      
-      // Display the workout plan in a modal or new section
-      alert("Workout plan generated! Check the console for details.");
+      setWorkoutPlan(data);
+      setActiveTab('workout-results');
     } catch (error) {
       console.error("Error generating workout plan:", error);
       alert("Error generating workout plan. Please try again.");
+    } finally {
+      setIsGeneratingWorkoutPlan(false);
     }
   };
 
@@ -144,6 +150,22 @@ function App() {
             >
               <TrendingUp size={20} />
               Progress
+            </button>
+            <button 
+              className={`nav-btn ${activeTab === 'meal-plan-results' ? 'active' : ''}`}
+              onClick={() => setActiveTab('meal-plan-results')}
+              style={{ display: mealPlan ? 'flex' : 'none' }}
+            >
+              <Utensils size={20} />
+              Meal Plan Results
+            </button>
+            <button 
+              className={`nav-btn ${activeTab === 'workout-results' ? 'active' : ''}`}
+              onClick={() => setActiveTab('workout-results')}
+              style={{ display: workoutPlan ? 'flex' : 'none' }}
+            >
+              <Activity size={20} />
+              Workout Results
             </button>
           </nav>
         </div>
@@ -296,8 +318,15 @@ function App() {
                   placeholder="e.g., nuts, dairy"
                 />
               </div>
-              <button className="generate-plan-button" onClick={generateMealPlan}>
-                Generate 7-Day Meal Plan
+              <button className="generate-plan-button" onClick={generateMealPlan} disabled={isGeneratingMealPlan}>
+                {isGeneratingMealPlan ? (
+                  <>
+                    <div className="spinner"></div>
+                    Generating Meal Plan...
+                  </>
+                ) : (
+                  'Generate 7-Day Meal Plan'
+                )}
               </button>
             </div>
           </div>
@@ -374,8 +403,15 @@ function App() {
                   placeholder="e.g., prefer compound movements, enjoy HIIT, avoid running"
                 />
               </div>
-              <button className="generate-plan-button" onClick={generateWorkoutPlan}>
-                Generate Personalized Workout Plan
+              <button className="generate-plan-button" onClick={generateWorkoutPlan} disabled={isGeneratingWorkoutPlan}>
+                {isGeneratingWorkoutPlan ? (
+                  <>
+                    <div className="spinner"></div>
+                    Generating Workout Plan...
+                  </>
+                ) : (
+                  'Generate Personalized Workout Plan'
+                )}
               </button>
             </div>
           </div>
@@ -403,6 +439,211 @@ function App() {
                 <h3>Achievements</h3>
                 <p>Coming soon - celebrate your milestones</p>
               </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'meal-plan-results' && mealPlan && (
+          <div className="meal-plan-results">
+            <div className="section-header">
+              <h2>Your 7-Day Meal Plan</h2>
+              <p>Personalized nutrition plan based on your preferences</p>
+            </div>
+            <div className="plan-results-container">
+              <div className="plan-summary">
+                <h3>Plan Summary</h3>
+                <div className="summary-stats">
+                  <div className="stat-card">
+                    <h4>Daily Calories</h4>
+                    <p>{mealPlan.dailyCalories || 'N/A'} kcal</p>
+                  </div>
+                  <div className="stat-card">
+                    <h4>Meals per Day</h4>
+                    <p>{mealPlan.weeklyPlan?.[0]?.meals?.length || 'N/A'}</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="weekly-plan">
+                <h3>Weekly Schedule</h3>
+                {mealPlan.weeklyPlan && mealPlan.weeklyPlan.map((day, index) => (
+                  <div key={index} className="day-plan">
+                    <h4>{day.day}</h4>
+                    <div className="meals-grid">
+                      {day.meals && day.meals.map((meal, mealIndex) => (
+                        <div key={mealIndex} className="meal-card">
+                          <h5>{meal.name}</h5>
+                          <div className="meal-details">
+                            <p><strong>Type:</strong> {meal.type}</p>
+                            <p><strong>Calories:</strong> {meal.calories} kcal</p>
+                            <div className="meal-macros">
+                              <span>Protein: {meal.protein}g</span>
+                              <span>Carbs: {meal.carbs}g</span>
+                              <span>Fat: {meal.fat}g</span>
+                            </div>
+                            <div className="meal-instructions">
+                              <p><strong>Ingredients:</strong> {meal.ingredients}</p>
+                              <p><strong>Instructions:</strong> {meal.instructions}</p>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {mealPlan.shoppingList && (
+                <div className="shopping-list">
+                  <h3>Shopping List</h3>
+                  <div className="shopping-items">
+                    {mealPlan.shoppingList.map((item, index) => (
+                      <div key={index} className="shopping-item">
+                        <span>• {item}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {mealPlan.mealPrepTips && (
+                <div className="meal-prep-tips">
+                  <h3>Meal Prep Tips</h3>
+                  <div className="tips-list">
+                    {mealPlan.mealPrepTips.map((tip, index) => (
+                      <div key={index} className="tip-item">
+                        <span>💡 {tip}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'workout-results' && workoutPlan && (
+          <div className="workout-results">
+            <div className="section-header">
+              <h2>Your Personalized Workout Plan</h2>
+              <p>Custom fitness routine based on your goals and experience</p>
+            </div>
+            <div className="plan-results-container">
+              <div className="plan-summary">
+                <h3>Plan Summary</h3>
+                <div className="summary-stats">
+                  <div className="stat-card">
+                    <h4>Goal</h4>
+                    <p>{workoutPlan.goal}</p>
+                  </div>
+                  <div className="stat-card">
+                    <h4>Experience Level</h4>
+                    <p>{workoutPlan.experienceLevel}</p>
+                  </div>
+                  <div className="stat-card">
+                    <h4>Workouts per Week</h4>
+                    <p>{workoutPlan.workoutsPerWeek}</p>
+                  </div>
+                  <div className="stat-card">
+                    <h4>Duration</h4>
+                    <p>{workoutPlan.workoutDuration} minutes</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="weekly-workouts">
+                <h3>Weekly Workout Schedule</h3>
+                {workoutPlan.weeklyWorkouts && workoutPlan.weeklyWorkouts.map((workout, index) => (
+                  <div key={index} className="workout-day">
+                    <h4>{workout.day}</h4>
+                    <div className="workout-content">
+                      <div className="workout-section">
+                        <h5>Warm-up</h5>
+                        <ul>
+                          {workout.warmup && workout.warmup.map((exercise, exIndex) => (
+                            <li key={exIndex}>{exercise}</li>
+                          ))}
+                        </ul>
+                      </div>
+
+                      <div className="workout-section">
+                        <h5>Main Exercises</h5>
+                        {workout.mainExercises && workout.mainExercises.map((exercise, exIndex) => (
+                          <div key={exIndex} className="exercise-card">
+                            <h6>{exercise.name}</h6>
+                            <div className="exercise-details">
+                              <p><strong>Sets:</strong> {exercise.sets}</p>
+                              <p><strong>Reps:</strong> {exercise.reps}</p>
+                              <p><strong>Rest:</strong> {exercise.restTime} seconds</p>
+                              <p><strong>Instructions:</strong> {exercise.instructions}</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className="workout-section">
+                        <h5>Cool-down</h5>
+                        <ul>
+                          {workout.cooldown && workout.cooldown.map((exercise, exIndex) => (
+                            <li key={exIndex}>{exercise}</li>
+                          ))}
+                        </ul>
+                      </div>
+
+                      {workout.progressionNotes && (
+                        <div className="progression-notes">
+                          <h5>Progression Notes</h5>
+                          <p>{workout.progressionNotes}</p>
+                        </div>
+                      )}
+
+                      {workout.formCues && (
+                        <div className="form-cues">
+                          <h5>Form Cues</h5>
+                          <ul>
+                            {workout.formCues.map((cue, cueIndex) => (
+                              <li key={cueIndex}>{cue}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {workoutPlan.nutritionRecommendations && (
+                <div className="nutrition-recommendations">
+                  <h3>Nutrition Recommendations</h3>
+                  <div className="nutrition-stats">
+                    <div className="nutrition-card">
+                      <h4>Protein</h4>
+                      <p>{workoutPlan.nutritionRecommendations.protein}</p>
+                    </div>
+                    <div className="nutrition-card">
+                      <h4>Carbohydrates</h4>
+                      <p>{workoutPlan.nutritionRecommendations.carbs}</p>
+                    </div>
+                    <div className="nutrition-card">
+                      <h4>Fats</h4>
+                      <p>{workoutPlan.nutritionRecommendations.fats}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {workoutPlan.recoveryGuidelines && (
+                <div className="recovery-guidelines">
+                  <h3>Recovery Guidelines</h3>
+                  <div className="guidelines-list">
+                    {workoutPlan.recoveryGuidelines.map((guideline, index) => (
+                      <div key={index} className="guideline-item">
+                        <span>💪 {guideline}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}
