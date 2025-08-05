@@ -71,9 +71,41 @@ function App() {
     }
   };
 
-  const generateWorkout = () => {
-    // Simulate workout generation
-    console.log("Generating workout plan...");
+  const generateWorkoutPlan = async () => {
+    try {
+      const fitnessGoal = document.getElementById('fitnessGoal').value;
+      const experienceLevel = document.getElementById('experienceLevel').value;
+      const workoutsPerWeek = document.getElementById('workoutsPerWeek').value;
+      const workoutDuration = document.getElementById('workoutDuration').value;
+      const availableEquipment = document.getElementById('availableEquipment').value;
+      const injuries = document.getElementById('injuries').value;
+      const preferences = document.getElementById('preferences').value;
+
+      const response = await fetch('http://localhost:8080/api/workout/generate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          fitnessGoal: fitnessGoal,
+          experienceLevel: experienceLevel,
+          workoutsPerWeek: parseInt(workoutsPerWeek),
+          workoutDuration: parseInt(workoutDuration),
+          availableEquipment: availableEquipment,
+          injuries: injuries,
+          preferences: preferences
+        })
+      });
+      
+      const data = await response.json();
+      console.log("Generated workout plan:", data);
+      
+      // Display the workout plan in a modal or new section
+      alert("Workout plan generated! Check the console for details.");
+    } catch (error) {
+      console.error("Error generating workout plan:", error);
+      alert("Error generating workout plan. Please try again.");
+    }
   };
 
   return (
@@ -274,34 +306,77 @@ function App() {
         {activeTab === 'workout' && (
           <div className="workout-section">
             <div className="section-header">
-              <h2>Personalized Workout Plans</h2>
-              <p>Get custom workout routines tailored to your fitness level and goals</p>
+              <h2>AI-Powered Workout Planning</h2>
+              <p>Create personalized workout plans based on your fitness goals and experience</p>
             </div>
-            <div className="workout-cards">
-              <div className="workout-card">
-                <div className="workout-icon">🏃‍♂️</div>
-                <h3>Cardio</h3>
-                <p>Improve endurance and burn calories</p>
-                <button className="workout-button" onClick={generateWorkout}>
-                  Generate Workout
-                </button>
+            <div className="workout-plan-form">
+              <div className="form-group">
+                <label htmlFor="fitnessGoal">Fitness Goal</label>
+                <select id="fitnessGoal" defaultValue="strength">
+                  <option value="strength">Strength Training</option>
+                  <option value="cardio">Cardio & Endurance</option>
+                  <option value="flexibility">Flexibility & Mobility</option>
+                  <option value="weight_loss">Weight Loss</option>
+                  <option value="muscle_gain">Muscle Gain</option>
+                  <option value="endurance">Endurance</option>
+                </select>
               </div>
-              <div className="workout-card">
-                <div className="workout-icon">🏋️‍♂️</div>
-                <h3>Strength</h3>
-                <p>Build muscle and increase strength</p>
-                <button className="workout-button" onClick={generateWorkout}>
-                  Generate Workout
-                </button>
+              <div className="form-group">
+                <label htmlFor="experienceLevel">Experience Level</label>
+                <select id="experienceLevel" defaultValue="beginner">
+                  <option value="beginner">Beginner</option>
+                  <option value="intermediate">Intermediate</option>
+                  <option value="advanced">Advanced</option>
+                </select>
               </div>
-              <div className="workout-card">
-                <div className="workout-icon">🧘‍♀️</div>
-                <h3>Flexibility</h3>
-                <p>Improve mobility and reduce injury risk</p>
-                <button className="workout-button" onClick={generateWorkout}>
-                  Generate Workout
-                </button>
+              <div className="form-group">
+                <label htmlFor="workoutsPerWeek">Workouts per Week</label>
+                <select id="workoutsPerWeek" defaultValue="3">
+                  <option value="2">2 workouts</option>
+                  <option value="3">3 workouts</option>
+                  <option value="4">4 workouts</option>
+                  <option value="5">5 workouts</option>
+                  <option value="6">6 workouts</option>
+                </select>
               </div>
+              <div className="form-group">
+                <label htmlFor="workoutDuration">Workout Duration (minutes)</label>
+                <select id="workoutDuration" defaultValue="45">
+                  <option value="30">30 minutes</option>
+                  <option value="45">45 minutes</option>
+                  <option value="60">60 minutes</option>
+                  <option value="75">75 minutes</option>
+                  <option value="90">90 minutes</option>
+                </select>
+              </div>
+              <div className="form-group">
+                <label htmlFor="availableEquipment">Available Equipment</label>
+                <select id="availableEquipment" defaultValue="minimal">
+                  <option value="none">No equipment (bodyweight only)</option>
+                  <option value="minimal">Minimal (dumbbells, resistance bands)</option>
+                  <option value="home_equipment">Home gym equipment</option>
+                  <option value="full_gym">Full gym access</option>
+                </select>
+              </div>
+              <div className="form-group">
+                <label htmlFor="injuries">Injuries/Limitations (optional)</label>
+                <input 
+                  type="text" 
+                  id="injuries" 
+                  placeholder="e.g., knee injury, back pain, shoulder issues"
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="preferences">Workout Preferences (optional)</label>
+                <input 
+                  type="text" 
+                  id="preferences" 
+                  placeholder="e.g., prefer compound movements, enjoy HIIT, avoid running"
+                />
+              </div>
+              <button className="generate-plan-button" onClick={generateWorkoutPlan}>
+                Generate Personalized Workout Plan
+              </button>
             </div>
           </div>
         )}

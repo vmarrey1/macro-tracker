@@ -1,7 +1,7 @@
 package com.macrotracker.backend.controller;
 
 import com.macrotracker.backend.dto.WorkoutPlanRequest;
-import com.macrotracker.backend.service.LlmService;
+import com.macrotracker.backend.service.LangGraphWorkoutPlanService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,15 +19,16 @@ public class WorkoutController {
     private static final Logger log = LoggerFactory.getLogger(WorkoutController.class);
     
     @Autowired
-    private LlmService llmService;
+    private LangGraphWorkoutPlanService langGraphWorkoutPlanService;
     
     @PostMapping("/generate")
     public Mono<ResponseEntity<String>> generateWorkoutPlan(@Valid @RequestBody WorkoutPlanRequest request) {
-        log.info("Generating workout plan for goal: {}", request.getGoal());
+        log.info("Generating workout plan with LangGraph for {} goal, {} level, {} workouts/week", 
+            request.getFitnessGoal(), request.getExperienceLevel(), request.getWorkoutsPerWeek());
         
-        return llmService.generateWorkoutPlan(request)
+        return langGraphWorkoutPlanService.generateWorkoutPlan(request)
                 .map(response -> {
-                    log.info("Successfully generated workout plan");
+                    log.info("Successfully generated workout plan with LangGraph");
                     return ResponseEntity.ok(response);
                 })
                 .onErrorReturn(ResponseEntity.internalServerError()

@@ -44,9 +44,11 @@ public class LlmService {
         return callOpenAI(prompt);
     }
     
+    // Workout plan generation moved to LangGraphWorkoutPlanService
+    // This method is kept for backward compatibility but delegates to the new service
     public Mono<String> generateWorkoutPlan(WorkoutPlanRequest request) {
-        String prompt = buildWorkoutPlanPrompt(request);
-        return callOpenAI(prompt);
+        log.warn("Using deprecated LlmService.generateWorkoutPlan - use LangGraphWorkoutPlanService instead");
+        throw new UnsupportedOperationException("Use LangGraphWorkoutPlanService for workout plan generation");
     }
     
     private String buildMealPlanPrompt(MealPlanRequest request) {
@@ -95,74 +97,7 @@ public class LlmService {
         return prompt.toString();
     }
     
-    private String buildWorkoutPlanPrompt(WorkoutPlanRequest request) {
-        StringBuilder prompt = new StringBuilder();
-        prompt.append("You are a professional fitness trainer and workout planner. ");
-        prompt.append("Create a detailed ").append(request.getDurationWeeks()).append("-week workout plan for a person with the following characteristics:\n\n");
-        prompt.append("- Age: ").append(request.getAge()).append(" years\n");
-        prompt.append("- Gender: ").append(request.getGender()).append("\n");
-        prompt.append("- Weight: ").append(request.getWeight()).append(" kg\n");
-        prompt.append("- Height: ").append(request.getHeight()).append(" cm\n");
-        prompt.append("- Activity Level: ").append(request.getActivityLevel()).append("\n");
-        prompt.append("- Goal: ").append(request.getGoal()).append("\n");
-        prompt.append("- Difficulty: ").append(request.getDifficulty()).append("\n");
-        prompt.append("- Workouts per week: ").append(request.getWorkoutsPerWeek()).append("\n");
-        
-        if (request.getFitnessExperience() != null && !request.getFitnessExperience().isEmpty()) {
-            prompt.append("- Fitness Experience: ").append(request.getFitnessExperience()).append("\n");
-        }
-        
-        if (request.getAvailableEquipment() != null && !request.getAvailableEquipment().isEmpty()) {
-            prompt.append("- Available Equipment: ").append(request.getAvailableEquipment()).append("\n");
-        }
-        
-        if (request.getTimeAvailability() != null && !request.getTimeAvailability().isEmpty()) {
-            prompt.append("- Time Availability: ").append(request.getTimeAvailability()).append("\n");
-        }
-        
-        if (request.getInjuries() != null && !request.getInjuries().isEmpty()) {
-            prompt.append("- Injuries/Limitations: ").append(request.getInjuries()).append("\n");
-        }
-        
-        if (request.getPreferences() != null && !request.getPreferences().isEmpty()) {
-            prompt.append("- Preferences: ").append(request.getPreferences()).append("\n");
-        }
-        
-        prompt.append("\nPlease provide:\n");
-        prompt.append("1. Weekly workout schedule\n");
-        prompt.append("2. For each workout, include: name, type, duration, difficulty, and exercises\n");
-        prompt.append("3. For each exercise, include: name, sets, reps, rest time, and instructions\n");
-        prompt.append("4. Progressive overload recommendations\n");
-        prompt.append("5. Recovery and rest day guidelines\n\n");
-        prompt.append("Format the response as JSON with the following structure:\n");
-        prompt.append("{\n");
-        prompt.append("  \"weeklySchedule\": [{\n");
-        prompt.append("    \"day\": \"Monday\",\n");
-        prompt.append("    \"workout\": {\n");
-        prompt.append("      \"name\": \"string\",\n");
-        prompt.append("      \"type\": \"strength|cardio|flexibility|hiit|yoga\",\n");
-        prompt.append("      \"duration\": \"string\",\n");
-        prompt.append("      \"difficulty\": \"beginner|intermediate|advanced\",\n");
-        prompt.append("      \"exercises\": [{\n");
-        prompt.append("        \"name\": \"string\",\n");
-        prompt.append("        \"category\": \"strength|cardio|flexibility|bodyweight\",\n");
-        prompt.append("        \"muscleGroup\": \"string\",\n");
-        prompt.append("        \"equipment\": \"string\",\n");
-        prompt.append("        \"sets\": number,\n");
-        prompt.append("        \"reps\": number,\n");
-        prompt.append("        \"duration\": number,\n");
-        prompt.append("        \"restTime\": number,\n");
-        prompt.append("        \"weight\": \"string\",\n");
-        prompt.append("        \"instructions\": \"string\"\n");
-        prompt.append("      }]\n");
-        prompt.append("    }\n");
-        prompt.append("  }],\n");
-        prompt.append("  \"progressiveOverload\": [\"tip1\", \"tip2\"],\n");
-        prompt.append("  \"recoveryGuidelines\": [\"guideline1\", \"guideline2\"]\n");
-        prompt.append("}");
-        
-        return prompt.toString();
-    }
+
     
     private Mono<String> callOpenAI(String prompt) {
         Map<String, Object> requestBody = new HashMap<>();
