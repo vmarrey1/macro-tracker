@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/Macro-Tracker/static/css/main.18c9eac2.css",
+    "main.js": "/Macro-Tracker/static/js/main.ffb9191c.js",
+    "static/js/453.670e15c7.chunk.js": "/Macro-Tracker/static/js/453.670e15c7.chunk.js",
+    "index.html": "/Macro-Tracker/index.html",
+    "main.18c9eac2.css.map": "/Macro-Tracker/static/css/main.18c9eac2.css.map",
+    "main.ffb9191c.js.map": "/Macro-Tracker/static/js/main.ffb9191c.js.map",
+    "453.670e15c7.chunk.js.map": "/Macro-Tracker/static/js/453.670e15c7.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.18c9eac2.css",
+    "static/js/main.ffb9191c.js"
+  ]
+}
